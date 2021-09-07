@@ -1,24 +1,24 @@
 import React from 'react'
 
-function Course(props){
+function Course({course}){
   return (
     <>
-      <Header text={props.course.name} />
-      <Content parts={props.course.parts} />
-      <Total parts={props.course.parts} />
+      <Header text={course.name} />
+      <Content parts={course.parts} />
+      <Total parts={course.parts} />
     </>
   );
 }
 
-function Header(props){
+function Header({text}){
   return (
-    <h1>{props.text}</h1>
+    <h1>{text}</h1>
   );
 }
 
-function Content(props){
+function Content({parts}){
   const elements = [];
-  props.parts.forEach(element => {
+  parts.forEach(element => {
     console.log(element);
     elements.push(<Part part={element} />);
   });
@@ -28,16 +28,16 @@ function Content(props){
   );
 }
 
-function Part(props){
+function Part({part}){
   return (
-    <p><b>{props.part.name}</b>: {props.part.exercises}</p>
+    <p><b>{part.name}</b>: {part.exercises}</p>
   )
 }
 
-function Total(props){
+function Total({parts}){
   let totalExerciseCount = 0;
 
-  props.parts.forEach(element => {
+  parts.forEach(element => {
     totalExerciseCount += element.exercises;
   });
 
