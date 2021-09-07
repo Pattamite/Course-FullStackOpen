@@ -1,23 +1,61 @@
-import React from 'react'
-
-// React component names must be capitalized!
-function Hello(props) {
-  
-  return (
-    <p>Hello world {props.name} {props.number}</p>
-  )
-}
+import React, { useState } from 'react'
 
 function App() {
-  const a = 10;
-  const b = 20;
+  const [timeCounter, setTimeCounter] = useState(0);
+
+  setTimeout(
+    () => setTimeCounter(timeCounter + 1),
+    1000
+  )
+
+  const [clickCounter, setClickCounter] = useState(0);
+
+  function changeClickCounterValue(value) {
+    setClickCounter(clickCounter + value);
+  }
+
+  function resetClickCounterValue() {
+    setClickCounter(0);
+  }
 
   return (
-    // can use <>
-    <div> 
-      <Hello name="Pattamite" number={a + b}/>
-      <p>{a} plus {b} is {a + b}</p>
-    </div> // can use </>
+    <div>
+        <Display 
+          counterName="Time counter" 
+          counter={timeCounter} 
+        />
+        <Display 
+          counterName="Click counter"
+          counter={clickCounter} 
+        />
+        <Button 
+          buttonName='Increase' 
+          onClickFunction={changeClickCounterValue.bind(null, 1)} 
+        />
+        <Button 
+          buttonName='Decrease' 
+          onClickFunction={changeClickCounterValue.bind(null, -1)} 
+        />
+        <Button 
+          buttonName='Reset' 
+          onClickFunction={resetClickCounterValue} 
+        />
+    </div>
+  );
+}
+
+// React component names must be capitalized!
+function Display({counterName, counter}) {
+  return (
+    <p>{counterName}: {counter}</p>
+  );
+}
+
+function Button({buttonName, onClickFunction}){
+  return(
+    <button onClick={onClickFunction}>
+      {buttonName}
+    </button>
   );
 }
 
