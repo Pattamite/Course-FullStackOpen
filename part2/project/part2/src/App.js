@@ -1,10 +1,23 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
+import axios from 'axios'
 import Note from './components/Note'
 
-function App({notes}) {
-  const [currentNotes, setNotes] = useState(notes);
+function App() {
+  const [notes, setNotes] = useState([]);
   const [newNote, setNewNote] = useState('A new note...');
   const [showAll, setShowAll] = useState(true);
+
+  useEffect(() => {
+    console.log('effect');
+    axios
+      .get('http://localhost:3001/notes')
+      .then( (response) => {
+        console.log('promise fulfilled');
+        setNotes(response.data);
+      });
+  }, []);
+
+  console.log('render', notes.length, 'notes')
 
   function addNote(event) {
     event.preventDefault();
@@ -12,9 +25,9 @@ function App({notes}) {
       content: newNote,
       date: new Date().toISOString(),
       important: Math.random() < 0.5,
-      id: currentNotes.length + 1,
+      id: notes.length + 1,
     };
-    setNotes(currentNotes.concat(newNoteObject));
+    setNotes(notes.concat(newNoteObject));
     console.log('button clicked', event.target);
   }
 
@@ -28,8 +41,8 @@ function App({notes}) {
   }
   
   const notesToShow = showAll
-    ? currentNotes
-    : currentNotes.filter( (note) => {return note.important;} );
+    ? notes
+    : notes.filter( (note) => {return note.important;} );
 
   //  Each child in a LIST (not <ul>) should have a unique "key" prop.
   return (
