@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from "react";
+import Input from "./components/Input"
+import Notification from "./components/Notification"
+import PersonDisplay from "./components/PersonDisplay"
 import PhonebookDb from "./services/PhonebookDb";
 
 function App() {
@@ -6,6 +9,11 @@ function App() {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [nameFilter, setNameFilter] = useState("");
+  const [notificationMessage, setNotificationMessage] = useState(null);
+  const [notificationClass, setNotificationClass] = useState('');
+
+  const notificationErrorClass = "error";
+  const notificationConfirmClass = "confirm";
 
   useEffect(() => {
     console.log('Start fetching data from database.');
@@ -16,6 +24,17 @@ function App() {
         setPersons(initialPersons);
       });
   }, []);
+
+  function setNotification(message, messageClass = notificationConfirmClass, timeout = 5000) {
+    setNotificationMessage(message);
+    setNotificationClass(messageClass);
+
+    if(timeout > 0) {
+      setTimeout(() => {
+        setNotificationMessage(null);
+      }, timeout);
+    }
+  }
 
   function newNameInputOnChangeHanlder(event) {
     console.log(event.target.value);
@@ -56,8 +75,13 @@ function App() {
     PhonebookDb
       .create(newPersonRecord)
       .then( (returnedPerson) => {
-        console.log('Add new entry successful.');
         setPersons(persons.concat(returnedPerson));
+        console.log('Add new entry successful.');
+        setNotification('Add new entry successful.', notificationConfirmClass);
+      })
+      .catch( (error) => {
+        console.log('Failed to add new entry.', error);
+        setNotification('Failed to add new entry.', notificationErrorClass);
       });
   }
 
@@ -71,10 +95,17 @@ function App() {
       .update(newPersonRecord.id, newPersonRecord)
       .then( (returnedPerson) => {
         console.log('Update entry successful.');
-        setPersons(persons.map((person) => {return person.id === returnedPerson.id
+        setPersons(persons.map((person) => {
+          console.log('Update entry successful.');
+          setNotification('Update entry successful.', notificationConfirmClass);
+          return person.id === returnedPerson.id
           ? returnedPerson
           : person;
         }));
+      })
+      .catch( (error) => {
+        console.log('Failed to update entry.', error);
+        setNotification('Failed to update entry.', notificationErrorClass);
       });
   }
 
@@ -90,8 +121,13 @@ function App() {
     PhonebookDb
       .remove(id)
       .then( (returnedMessage) => {
-        console.log('Remove entry successful.');
         setPersons(persons.filter((person) => {return person.id !== id}));
+        console.log('Remove entry successful.');
+        setNotification('Remove entry successful.', notificationConfirmClass);
+      })
+      .catch( (error) => {
+        console.log('Failed to remove entry.', error);
+        setNotification('Failed to remove entry.', notificationErrorClass);
       });
   }
 
@@ -102,6 +138,10 @@ function App() {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification 
+        message={notificationMessage}
+        notificationClass={notificationClass}
+      />
       <Input
         text="filter:"
         value={nameFilter}
@@ -135,24 +175,8 @@ function App() {
   );
 }
 
-function Input({ text, value, onChange }) {
-  return (
-    <div>
-      {text}
-      <input value={value} onChange={onChange} />
-    </div>
-  );
-}
 
-function PersonDisplay({person, deleteCallBackFunction}) {
-  return (
-    <>
-    <p key={person.name}>
-      {person.name} {person.number}
-    </p>
-    <button onClick={deleteCallBackFunction}>remove</button>
-    </>
-  );
-}
+
+
 
 export default App;
