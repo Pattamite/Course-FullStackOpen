@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from 'axios'
+import PhonebookDb from "./services/PhonebookDb";
 
 function App() {
   const [persons, setPersons] = useState([]);
@@ -9,49 +9,90 @@ function App() {
 
   useEffect(() => {
     console.log('Start fetching data from database.');
-    axios
-      .get('http://localhost:3001/persons')
-      .then( (response) => {
+    PhonebookDb
+      .getAll()
+      .then( (initialPersons) => {
         console.log('Data received.');
-        setPersons(response.data);
+        setPersons(initialPersons);
       });
   }, []);
 
-  function NewNameInputOnChangeHanlder(event) {
+  function newNameInputOnChangeHanlder(event) {
     console.log(event.target.value);
     setNewName(event.target.value);
   }
 
-  function NewNumberInputOnChangeHanlder(event) {
+  function newNumberInputOnChangeHanlder(event) {
     console.log(event.target.value);
     setNewNumber(event.target.value);
   }
 
-  function NameFilterInputOnChangeHanlder(event) {
+  function nameFilterInputOnChangeHanlder(event) {
     console.log(event.target.value);
     setNameFilter(event.target.value);
   }
 
-  function AddNewNameHandler(event) {
+  function addNewNameHandler(event) {
     event.preventDefault();
 
-    let isFoundDuplicateName = false;
-    persons.forEach((person) => {
-      if (person.name === newName) {
-        isFoundDuplicateName = true;
+    const person = persons.find((person) => {return person.name === newName;});
+    if (person) {
+      const result = window.confirm(`${person.name} is already added to the phonebook, update the number?`);
+      if(result) {
+        editNumberOfPerson(person);
       }
-    });
-    if (isFoundDuplicateName) {
-      alert(`${newName} is already added to this phonebook.`);
       return;
     }
 
+    addNewName();
+  }
+
+  function addNewName() {
     const newPersonRecord = {
       name: newName,
       number: newNumber,
     };
-    setPersons(persons.concat(newPersonRecord));
-    console.log(persons);
+
+    PhonebookDb
+      .create(newPersonRecord)
+      .then( (returnedPerson) => {
+        console.log('Add new entry successful.');
+        setPersons(persons.concat(returnedPerson));
+      });
+  }
+
+  function editNumberOfPerson(person) {
+    const newPersonRecord = {
+      ...person,
+      number: newNumber,
+    };
+
+    PhonebookDb
+      .update(newPersonRecord.id, newPersonRecord)
+      .then( (returnedPerson) => {
+        console.log('Update entry successful.');
+        setPersons(persons.map((person) => {return person.id === returnedPerson.id
+          ? returnedPerson
+          : person;
+        }));
+      });
+  }
+
+  function removeNameById(id) {
+    const person = persons.find((person) => {return person.id === id} );
+
+    const result = window.confirm(`Delete ${person.name}?`);
+
+    if(!result){
+      return;
+    }
+
+    PhonebookDb
+      .remove(id)
+      .then( (returnedMessage) => {
+        console.log('Remove entry successful.');
+        setPersons(persons.filter((person) => {return person.id !== id}));
+      });
   }
 
   const filterPersons = persons.filter((person) => {
@@ -64,19 +105,19 @@ function App() {
       <Input
         text="filter:"
         value={nameFilter}
-        onChange={NameFilterInputOnChangeHanlder}
+        onChange={nameFilterInputOnChangeHanlder}
       />
       <h2>Add new Entry</h2>
-      <form onSubmit={AddNewNameHandler}>
+      <form onSubmit={addNewNameHandler}>
         <Input
           text="name:"
           value={newName}
-          onChange={NewNameInputOnChangeHanlder}
+          onChange={newNameInputOnChangeHanlder}
         />
         <Input
           text="number:"
           value={newNumber}
-          onChange={NewNumberInputOnChangeHanlder}
+          onChange={newNumberInputOnChangeHanlder}
         />
         <div>
           <button type="submit">add</button>
@@ -84,7 +125,11 @@ function App() {
       </form>
       <h2>Numbers</h2>
       {filterPersons.map((person) => {
-        return <PersonLog key={person.name} person={person} />;
+        return <PersonDisplay 
+          key={person.name} 
+          person={person} 
+          deleteCallBackFunction={removeNameById.bind(null, person.id)}
+          />;
       })}
     </div>
   );
@@ -99,11 +144,14 @@ function Input({ text, value, onChange }) {
   );
 }
 
-function PersonLog({ person }) {
+function PersonDisplay({person, deleteCallBackFunction}) {
   return (
+    <>
     <p key={person.name}>
       {person.name} {person.number}
     </p>
+    <button onClick={deleteCallBackFunction}>remove</button>
+    </>
   );
 }
 
