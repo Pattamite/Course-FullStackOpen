@@ -1,0 +1,44 @@
+{
+  "anecdotes": [
+    {
+      "id": 1,
+      "text": "test1",
+      "vote": 1
+    },
+    {
+      "id": 2,
+      "text": "test2",
+      "vote": 8
+    },
+    {
+      "text": "test",
+      "vote": 0,
+      "id": 3
+    },
+    {
+      "text": "test",
+      "vote": 5,
+      "id": 4
+    },
+    {
+      "text": "123",
+      "vote": 0,
+      "id": 5
+    },
+    {
+      "text": "12345",
+      "vote": 0,
+      "id": 6
+    },
+    {
+      "text": "testt",
+      "vote": 3,
+      "id": 7
+    },
+    {
+      "text": "123444",
+      "vote": 1,
+      "id": 8
+    }
+  ]
+}
