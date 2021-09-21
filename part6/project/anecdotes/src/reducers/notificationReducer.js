@@ -6,6 +6,8 @@ export const notificationTypeError = 'TYPE_ERROR';
 export const notificationTypeConfirm = 'TYPE_CONFIRM';
 export const notificationTypeHide = 'TYPE_HIDE';
 
+let currentTimeoutId = null;
+
 const initialState = {
   type: notificationTypeHide,
   message: '',
@@ -36,6 +38,8 @@ function notificationReducer(state = initialState, action) {
 
 export function setNotification(message, type = notificationTypeConfirm, timeout = 5000) {
   return async (dispatch) => {
+    clearTimeout(currentTimeoutId);
+
     dispatch({
       type: actionTypeSetType,
       data : { type: type },
@@ -45,7 +49,7 @@ export function setNotification(message, type = notificationTypeConfirm, timeout
       data : { message: message },
     });
 
-    await setTimeout(() => {
+    currentTimeoutId = await setTimeout(() => {
       dispatch({
         type: actionTypeSetType,
         data : { type: notificationTypeHide },

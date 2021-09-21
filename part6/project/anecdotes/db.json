@@ -3,36 +3,36 @@
     {
       "id": 1,
       "text": "test1",
-      "vote": 1
+      "vote": 2
     },
     {
       "id": 2,
       "text": "test2",
-      "vote": 8
+      "vote": 14
     },
     {
       "text": "test",
-      "vote": 0,
+      "vote": 2,
       "id": 3
     },
     {
       "text": "test",
-      "vote": 5,
+      "vote": 7,
       "id": 4
     },
     {
       "text": "123",
-      "vote": 0,
+      "vote": 1,
       "id": 5
     },
     {
       "text": "12345",
-      "vote": 0,
+      "vote": 2,
       "id": 6
     },
     {
       "text": "testt",
-      "vote": 3,
+      "vote": 5,
       "id": 7
     },
     {
